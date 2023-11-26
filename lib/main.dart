@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qrscan/qrscan.dart' as scanner;
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +14,21 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    String? result = "Hello World...!";
+    Future _scanQR() async {
+      try {
+        String? cameraScanResult = await scanner.scan();
+        //print(cameraScanResult);
+
+        /*setState(() {
+          result = cameraScanResult; // setting string result with cameraScanResult
+        });*/
+      } on PlatformException catch (e) {
+        print(e);
+      }
+    }
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -115,13 +132,14 @@ class MyApp extends StatelessWidget {
 
               ],
               onTap: (index) {
-                if (index == 0) {
+                if (index == 0) {//scan
                   print('Home');
-                } else if (index == 1) {
+                  _scanQR();
+                } else if (index == 1) {//clear
                   print('us');
-                } else if (index == 2) {
+                } else if (index == 2) {//about us
                   print('Favorites');
-                } else if (index == 3) {
+                } else if (index == 3) {//exit
                   print('Settings');
                 }
               },
@@ -227,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return GestureDetector(
                 onTap: (){
                   setState(() {
-                    colors[index] = colors[index] == Colors.white ? Color(0xFF356DE5) : Colors.white;
+                    colors[index] = colors[index] == Colors.white ? Colors.blue : Colors.white;
                   });
                 },
                 child: Card(
