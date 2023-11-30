@@ -30,17 +30,18 @@ class BottomNavigator extends StatelessWidget {
           label: 'Exit',
         ),
       ],
-      onTap: (index) async{
+      onTap: (index) async {
         if (index == 0) {//scan
-          print('Home');
+          Provider.of<ScannerState>(context,listen: false).setIsLoading(true);
           await Provider.of<ScannerState>(context,listen: false).scanQR();
+          Provider.of<ScannerState>(context,listen: false).setIsLoading(false);
           //_scanQR();
         } else if (index == 1) {//clear
-          print('us');
+
         } else if (index == 2) {//about us
-          print('Favorites');
+
         } else if (index == 3) {//exit
-          print('Settings');
+
         }
       },
     );
