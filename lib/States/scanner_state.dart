@@ -41,6 +41,13 @@ class ScannerState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetBoards(){
+    if(selected_boards != null){
+      _selected_boards = [];
+    }
+    notifyListeners();
+  }
+
   void setSelectedBoard(String value) {
     if (_boards == null || _boards.isEmpty) {
       print('No boards available.');

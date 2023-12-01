@@ -59,18 +59,20 @@ class _MyHomePageState extends State<MyHomePage> {
   final board_id_controller = TextEditingController();
 
   List<List<int>>? numbers;
-      //List.generate(5, (index) => List.generate(5, (j) => 0));
+
+  //List.generate(5, (index) => List.generate(5, (j) => 0));
   List<Color> colors = List.generate(25, (index) => Colors.white);
 
   @override
   Widget build(BuildContext context) {
-    var blueShades = [
+    /*var blueShades = [
       Colors.blue[200],
       Colors.blue[300],
       Colors.blue[400],
       Colors.blue[500],
       Colors.blue[600]
-    ];
+    ];*/
+    List<Color> blueShades = [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue];
     return Material(
       child: Column(
         children: <Widget>[
@@ -80,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 // Add this
                 child: Padding(
-                  padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                  padding: EdgeInsets.only(left: 20.0, right: 20.0,bottom: 15.0),
                   child: TextField(
                     controller: board_id_controller,
                     keyboardType: TextInputType.number,
@@ -104,7 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ), // Add this
                     ),
                     onSubmitted: (value) {
-                      Provider.of<ScannerState>(context,listen: false).setSelectedBoard(value);
+                      Provider.of<ScannerState>(context, listen: false)
+                          .setSelectedBoard(value);
                       /*setState(() {
                         numbers = fetchNumbers(value);
                       });*/
@@ -114,39 +117,63 @@ class _MyHomePageState extends State<MyHomePage> {
               ), // Add this
             ],
           ), // A,
-          Row(
+          /*Row(
             // Add this
             mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Add this
-            children: 'ARADO'
+            children: 'BINGO'
                 .split('')
                 .map((letter) => Text(letter,
                     style: TextStyle(
                         fontSize: 52.0,
-                        color: blueShades['ARADO'.indexOf(letter)],
+                        color: blueShades['BINGO'.indexOf(letter)],
                         fontWeight: FontWeight.w900)))
                 .toList(), // Add this
-          ),
-          Row(
-            // Add this
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Add this
-            children: <Widget>[
-              Text('board number goes here'),
-            ] // Add this
-          ),
-          Consumer<ScannerState>(
-              builder:(context,ScannerState,_){
-                return Wrap(
-                  spacing: 2.0, // space between rows
-                  runSpacing: 10.0, // space between lines
-                  children: List<Widget>.generate(ScannerState.selected_boards.length, (boardIndex) {
-                    return SizedBox(
-                      width: ScannerState.selected_boards.length < 2 ? MediaQuery.of(context).size.width - 5:MediaQuery.of(context).size.width / 2 - 5, // adjust width as needed
-                      child: Card(
-                        margin: EdgeInsets.all(2.0), // Add margin to create space between the grids
+          ),*/
+
+          Consumer<ScannerState>(builder: (context, ScannerState, _) {
+            return Wrap(
+              spacing: 2.0, // space between rows
+              runSpacing: 10.0, // space between lines
+              children: List<Widget>.generate(
+                  ScannerState.selected_boards.length, (boardIndex) {
+                List<Color> boardColors = List.filled(25, Colors.white);
+                return SizedBox(
+                  width: ScannerState.selected_boards.length < 2
+                      ? MediaQuery.of(context).size.width - 5
+                      : MediaQuery.of(context).size.width / 2 -
+                          5, // adjust width as needed
+                  child: Column(
+                    children: [
+                      Row(
+                        // Add this
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Add this
+                        children: 'BINGO'
+                            .split('')
+                            .map((letter) => Text(letter,
+                            style: TextStyle(
+                                fontSize: 24.0,
+                                color: blueShades['BINGO'.indexOf(letter)],
+                                fontWeight: FontWeight.w900,
+                              shadows: [
+                                Shadow( // bottomLeft
+                                  offset: Offset(-1.0, -1.0),
+                                  color: Colors.black,
+                                )
+                              ],
+                              letterSpacing: 2.0, // adjust as needed
+                              wordSpacing: 2.0, // adjust as needed
+                            )),
+                        )
+                            .toList(), // Add this
+                      ),
+                      Card(
+                        margin: EdgeInsets.all(2.0),
+                        // Add margin to create space between the grids
                         child: GridView.builder(
                           shrinkWrap: true,
                           itemCount: 25,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 5,
                             crossAxisSpacing: 0.0,
                             mainAxisSpacing: 0.0,
@@ -168,21 +195,19 @@ class _MyHomePageState extends State<MyHomePage> {
                                     borderRadius: BorderRadius.circular(10.0),
                                     border: Border.all(color: Colors.white10),
                                   ),
-                                  child: LayoutBuilder(
-                                    builder: (BuildContext context, BoxConstraints constraints) {
-                                      return Center(
-                                        child: Text(
-                                          ScannerState.selected_boards[boardIndex].cartNums[index % 5][index ~/ 5].toString(),
-                                          style: TextStyle(
-                                            fontSize: constraints.maxHeight / 2+10, // adjust as needed
-                                            color: colors[index] == Colors.white
-                                                ? Colors.blueGrey
-                                                : Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                  child: Center(
+                                    child: Text(
+                                      ScannerState.selected_boards[boardIndex]
+                                          .cartNums[index % 5][index ~/ 5]
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 24.0, // adjust as needed
+                                        color: colors[index] == Colors.white
+                                            ? Colors.blueGrey
+                                            : Colors.white,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -190,11 +215,39 @@ class _MyHomePageState extends State<MyHomePage> {
                           },
                         ),
                       ),
-                    );
-                  }),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        // adjust as needed
+                        children: <Widget>[
+                          Text(
+                            'Board Number: ${ScannerState.selected_boards[boardIndex].boardId}',
+                            // Add your board number here
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              // adjust as needed
+                              fontWeight: FontWeight.bold,
+                              // adjust as needed
+                              color: Colors.blue, // adjust as needed
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                              color: Colors.red, // adjust as needed
+                              size: 24.0, // adjust as needed
+                            ),
+                            onPressed: () {
+                              // Add your clear function here
+                            },
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 );
-              }
-          ),
+              }),
+            );
+          }),
         ],
       ),
     );
