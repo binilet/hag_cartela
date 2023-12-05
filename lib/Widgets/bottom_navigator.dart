@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hag_cart/States/scanner_state.dart';
 import 'package:provider/provider.dart';
 
@@ -6,9 +7,9 @@ class BottomNavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      backgroundColor: Color(0xFF356DE5), // Add this
-      selectedItemColor: Colors.white, // Add this
-      unselectedItemColor: Colors.white.withOpacity(1), // Add this
+      backgroundColor: Colors.white,//Color(0xFF356DE5), // Add this
+      selectedItemColor: Colors.blue, // Add this
+      unselectedItemColor: Colors.blue.withOpacity(1.0), // Add this
       //selectedFontSize: 14.0, // Add this
       //unselectedFontSize: 14.0, // Add this
       type: BottomNavigationBarType.fixed, // Add this
@@ -39,10 +40,39 @@ class BottomNavigator extends StatelessWidget {
         } else if (index == 1) {//clear
           Provider.of<ScannerState>(context,listen:false).resetBoards();
         } else if (index == 2) {//about us
-
+          showAboutUsPopup(context);
         } else if (index == 3) {//exit
-
+          SystemNavigator.pop();
         }
+      },
+    );
+  }
+
+  void showAboutUsPopup(BuildContext context) {
+    final currentYear = DateTime.now().year;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('About Us'),
+          content: Column(
+            children: [
+              Text('Welcome to Hagere Games!'),
+          SizedBox(height: 10),
+          Text('We create exciting and innovative games for you to enjoy.'),
+          SizedBox(height: 10),
+          Text('Copyright © $currentYear Hagere Games. All rights reserved.'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the popup
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
       },
     );
   }

@@ -13,10 +13,12 @@ class Board {
   final List<List<int>> cartNums;
 
   Board(
-      {required this.boardId,
+      {
+        required this.boardId,
       required this.branch,
       required this.companyId,
-      required this.cartNums});
+      required this.cartNums
+      });
 }
 
 class ScannerState extends ChangeNotifier {
@@ -30,14 +32,27 @@ class ScannerState extends ChangeNotifier {
   Board? _selectedBoard;
   bool _isLoading = false;
 
+  bool _isLoadingDone = false;
+  bool get isLoadingDone => _isLoadingDone;
+
   bool get isLoading => _isLoading;
 
   List<Board> get boards => _boards;
 
   Board? get selectedBoard => _selectedBoard;
 
+  String? _message;
+  String? get message => _message;
+
+
+
   void setIsLoading(bool value) {
     _isLoading = value;
+    notifyListeners();
+  }
+
+  void removeBoard(int id){
+    _selected_boards.removeWhere((element) => element.boardId == id);
     notifyListeners();
   }
 
@@ -61,17 +76,15 @@ class ScannerState extends ChangeNotifier {
               (element) => element.boardId.toString() == value
       );
     }catch(e){
-        print('no fikir objects');
+        _message = "Cartela not found!";
+        notifyListeners();
     }
-    // Assuming boardId is an integer
-
-
     if (selected != null) {
       _selectedBoard = selected;
       _selected_boards?.add(_selectedBoard!);
+      _message = "";
     } else {
-      print('No board found with boardId: $value');
-      // You might want to throw an exception or handle this case differently based on your requirements.
+      _message = "No board found with board Id: $value";
     }
 
     notifyListeners();
@@ -82,7 +95,7 @@ class ScannerState extends ChangeNotifier {
     try {
       //String? cameraScanResult = await scanner.scan();
       //scannedCompanyId = cameraScanResult;
-
+      _isLoadingDone = false;
       //var url = Uri.parse("http://192.168.56.1:5000/api/boards/company/$scannedCompanyId");
       var url =
           Uri.parse("https://a3cdba200cac419a9db92572fbcb9a07.api.mockbin.io/");
@@ -97,20 +110,21 @@ class ScannerState extends ChangeNotifier {
                 cartNums: List<List<int>>.from(
                     item['board_numbers'].map((i) => List<int>.from(i)))))
             .toList();
-        print(
-            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-        print(_boards.length);
-        print(_boards[0]?.cartNums);
-        print(
-            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
         for (int i = 0; i < _boards.length; i++) print(_boards[i].boardId);
-      } else {
-        throw Exception("Failed to load boards");
-      }
 
+      } else {
+        _isLoadingDone = true;
+        setIsLoading(false);
+        _message = "Failed to load boards";
+        //throw Exception("Failed to load boards");
+      }
+      _message = "${_boards.length} Cartelas found!";
+      _isLoadingDone = true;
       notifyListeners();
     } on PlatformException catch (e) {
-      print(e);
+      print('exception thrown');
+      _isLoadingDone = true;
+      setIsLoading(false);
     }
   }
 }
