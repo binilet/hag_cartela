@@ -42,6 +42,7 @@ dev_dependencies:
     sdk: flutter
   qrscan: ^0.3.3
   http: ^1.1.2
+  permission_handler: ^11.1.0
 
 
   # The "flutter_lints" package below contains a set of recommended lints to

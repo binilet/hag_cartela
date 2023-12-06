@@ -23,7 +23,9 @@ class Board {
 
 class ScannerState extends ChangeNotifier {
 
-  String? scannedCompanyId = "";
+  String? _scannedCompanyId = "";
+  String? get scannedCompanyId => _scannedCompanyId;
+
   List<Board> _boards = [];
 
   List<Board> _selected_boards = [];
@@ -69,7 +71,6 @@ class ScannerState extends ChangeNotifier {
       // You might want to throw an exception or handle this case differently based on your requirements.
       return;
     }
-
     Board? selected;
     try{
       selected = _boards.firstWhere(
@@ -80,26 +81,41 @@ class ScannerState extends ChangeNotifier {
         notifyListeners();
     }
     if (selected != null) {
-      _selectedBoard = selected;
-      _selected_boards?.add(_selectedBoard!);
-      _message = "";
+      if(_selected_boards!.length < 4 )
+      {
+        if (!_selected_boards!.contains(selected)) {
+          _selectedBoard = selected;
+          _selected_boards?.add(_selectedBoard!);
+          _message = "";
+        } else {
+          _message = "Board already added!";
+        }
+      }else{
+        _message = "Maximum board reached (4)!";
+      }
+
     } else {
       _message = "No board found with board Id: $value";
     }
-
     notifyListeners();
   }
 
 
   Future scanQR() async {
     try {
-      //String? cameraScanResult = await scanner.scan();
-      //scannedCompanyId = cameraScanResult;
+      String? cameraScanResult = await scanner.scan();
+      _scannedCompanyId = cameraScanResult;
       _isLoadingDone = false;
-      //var url = Uri.parse("http://192.168.56.1:5000/api/boards/company/$scannedCompanyId");
-      var url =
-          Uri.parse("https://a3cdba200cac419a9db92572fbcb9a07.api.mockbin.io/");
-      var response = await http.get(url);
+
+      //production url
+      var url = Uri.parse("http://161.35.114.115:5001/api/boards/company/$_scannedCompanyId");
+
+
+      //test url
+      //var url = Uri.parse("https://a3cdba200cac419a9db92572fbcb9a07.api.mockbin.io/");
+
+
+      var response = await http.get(url,headers: {'x-api-key': 'b7a3c12d7b9e46a396155c95b052f94e'});
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body) as List;
         _boards = data

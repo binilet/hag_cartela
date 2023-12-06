@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hag_cart/States/scanner_state.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class BottomNavigator extends StatelessWidget {
   @override
@@ -33,6 +35,21 @@ class BottomNavigator extends StatelessWidget {
       ],
       onTap: (index) async {
         if (index == 0) {//scan
+
+          final cameraStatus = await Permission.camera.status;
+          final storageStatus = await Permission.storage.status;
+
+
+          if(cameraStatus.isDenied ){
+            await Permission.camera.request();
+          }
+
+          if(storageStatus.isDenied){
+            await Permission.storage.request();
+          }
+
+
+
           Provider.of<ScannerState>(context,listen: false).setIsLoading(true);
           await Provider.of<ScannerState>(context,listen: false).scanQR();
           Provider.of<ScannerState>(context,listen: false).setIsLoading(false);

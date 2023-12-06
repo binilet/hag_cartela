@@ -135,13 +135,24 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                       ),
 
-                      Text(
-                        myState.isLoadingDone ? '${myState.message}' : '',
-                        style: TextStyle(
-                            color: myState.boards.length > 0 ? Colors.blue : Colors.red,
-                            fontWeight: FontWeight.w100),
+                      Column(
+                        children: [
+                          Text(
+                            myState.isLoadingDone ? '${myState.message}' : '',
+                            style: TextStyle(
+                                color: myState.boards.length > 0 ? Colors.blue : Colors.red,
+                                fontWeight: FontWeight.w400),
 
-                      ),
+                          ),
+                          Text(
+                            myState.scannedCompanyId != null ? myState.scannedCompanyId.toString() : '',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.w400),
+
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -228,7 +239,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                     border: Border.all(color: Colors.white10),
                                   ),
                                   child: Center(
-                                    child: Text(
+                                    child: (index % 5 == 2 && index ~/ 5 == 2)
+                                        ? Icon(
+                                      Icons.ac_unit_rounded, // replace with your preferred icon
+                                      color: boardColorsList?[boardIndex][index] == Colors.white
+                                          ? Colors.blueGrey
+                                          : Colors.white,
+                                    )
+                                        : Text(
                                       ScannerState.selected_boards[boardIndex]
                                           .cartNums[index % 5][index ~/ 5]
                                           .toString(),
