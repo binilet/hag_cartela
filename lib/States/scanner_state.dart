@@ -66,6 +66,8 @@ class ScannerState extends ChangeNotifier {
   }
 
   void setSelectedBoard(String value) {
+    //print('from new screeen.[$value]');
+    //print('from new screeen.${_boards.length}');
     if (_boards == null || _boards.isEmpty) {
       print('No boards available.');
       // You might want to throw an exception or handle this case differently based on your requirements.
@@ -88,7 +90,8 @@ class ScannerState extends ChangeNotifier {
           _selected_boards?.add(_selectedBoard!);
           _message = "";
         } else {
-          _message = "Board already added!";
+          _selected_boards.removeWhere((element) => element.boardId.toString() == value);
+          //_message = "Board already added!";
         }
       }else{
         _message = "Maximum board reached (4)!";
@@ -116,6 +119,7 @@ class ScannerState extends ChangeNotifier {
 
 
       var response = await http.get(url,headers: {'x-api-key': 'b7a3c12d7b9e46a396155c95b052f94e'});
+      //var response = await http.get(url);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body) as List;
         _boards = data
@@ -133,6 +137,7 @@ class ScannerState extends ChangeNotifier {
         setIsLoading(false);
         _message = "Failed to load boards";
         //throw Exception("Failed to load boards");
+        print('failed to load boards');
       }
       _message = "${_boards.length} Cartelas found!";
       _isLoadingDone = true;

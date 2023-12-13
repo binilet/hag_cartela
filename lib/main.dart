@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import './Widgets/bottom_navigator.dart';
 import 'package:provider/provider.dart';
 import './States/scanner_state.dart';
+import './Widgets/BoardSelector.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,7 +41,31 @@ class MyApp extends StatelessWidget {
               padding: EdgeInsets.only(top: 10.0),
               child: MyHomePage(),
             ),
-          ),
+          ) /*Stack(
+            children: [
+              const SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: MyHomePage(),
+                ),
+              ),
+              // Text watermark overlay
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Center(
+                    child: Text(
+                      'HAGERE GAMES!',
+                      style: TextStyle(
+                        color: Colors.grey.withOpacity(0.5), // Adjust color and opacity
+                        fontSize: 20.0, // Adjust the font size
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )*/,
           bottomNavigationBar: BottomNavigator(),
         ),
       ),
@@ -87,6 +112,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     List<Color> blueShades = [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue];
     final myState = Provider.of<ScannerState>(context);
+    // Get the screen width
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    // Calculate the text size based on the screen width
+    double textSize = screenWidth * 0.04; // You can adjust the multiplier as needed
     return Material(
       child: Column(
         children: <Widget>[
@@ -96,10 +126,10 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 // Add this
                 child: Padding(
-                  padding: EdgeInsets.only(left: 20.0, right: 20.0,bottom: 15.0),
+                  padding: EdgeInsets.only(left: 10.0, right: 10.0,bottom: 1.0),
                   child: Column(
                     children: [
-                      TextField(
+                      /*TextField(
                         controller: board_id_controller,
                         keyboardType: TextInputType.number,
                         style: TextStyle(
@@ -133,9 +163,39 @@ class _MyHomePageState extends State<MyHomePage> {
                         numbers = fetchNumbers(value);
                       });*/
                         },
-                      ),
+                      ),*/
+                      ElevatedButton(
+                        onPressed: () {
+                          // Handle button press here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BoardSelectorWidget(data: myState.boards),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.blue, // This is the background color
+                          onPrimary: Colors.white, // This is the color of the text and icon
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10), // This is the border radius
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16), // Adjust as needed
+                          minimumSize: Size(250, 50), // Adjust as needed
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.add), // Add your desired icon
+                            SizedBox(width: 8), // Adjust spacing between icon and text
+                            Text('Select Cartela Here',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16.0),),
+                          ],
+                        ),
+                      )
+                      ,
 
-                      Column(
+
+      Column(
                         children: [
                           Text(
                             myState.isLoadingDone ? '${myState.message}' : '',
@@ -193,7 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Add this
                         children: 'BINGO'
                             .split('')
-                            .map((letter) => Text(letter,
+                               .map((letter) => Text(letter,
                             style: TextStyle(
                                 fontSize: 24.0,
                                 color: blueShades['BINGO'.indexOf(letter)],
@@ -251,7 +311,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           .cartNums[index % 5][index ~/ 5]
                                           .toString(),
                                       style: TextStyle(
-                                        fontSize: 24.0, // adjust as needed
+                                        fontSize: textSize, // adjust as needed
                                         color: boardColorsList?[boardIndex][index] == Colors.white
                                             ? Colors.blueGrey
                                             : Colors.white,

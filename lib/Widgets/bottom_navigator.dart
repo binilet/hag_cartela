@@ -50,7 +50,7 @@ class BottomNavigator extends StatelessWidget {
           Provider.of<ScannerState>(context,listen: false).setIsLoading(true);
           await Provider.of<ScannerState>(context,listen: false).scanQR();
           Provider.of<ScannerState>(context,listen: false).setIsLoading(false);
-          //_scanQR();
+
         } else if (index == 1) {//clear
           Provider.of<ScannerState>(context,listen:false).resetBoards();
         } else if (index == 2) {//about us
