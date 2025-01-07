@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hag_cart/States/scanner_state.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import './Jackpot/jackpot.dart';
 
 
 class BottomNavigator extends StatelessWidget {
@@ -21,6 +22,10 @@ class BottomNavigator extends StatelessWidget {
           label: 'Scan',
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.gamepad),
+          label: 'Jackpot',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.cleaning_services_rounded),
           label: 'Clear',
         ),
@@ -35,10 +40,8 @@ class BottomNavigator extends StatelessWidget {
       ],
       onTap: (index) async {
         if (index == 0) {//scan
-
           final cameraStatus = await Permission.camera.status;
           final storageStatus = await Permission.storage.status;
-
 
           if(cameraStatus.isDenied ){
             await Permission.camera.request();
@@ -51,11 +54,14 @@ class BottomNavigator extends StatelessWidget {
           await Provider.of<ScannerState>(context,listen: false).scanQR();
           Provider.of<ScannerState>(context,listen: false).setIsLoading(false);
 
-        } else if (index == 1) {//clear
+        }else if(index == 1){
+          Navigator.push(context,MaterialPageRoute(builder: (context) => Jackpot()));
+        }
+        else if (index == 2) {//clear
           Provider.of<ScannerState>(context,listen:false).resetBoards();
-        } else if (index == 2) {//about us
+        } else if (index == 3) {//about us
           showAboutUsPopup(context);
-        } else if (index == 3) {//exit
+        } else if (index == 4) {//exit
           SystemNavigator.pop();
         }
       },

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:hag_cart/States/cartelas_state.dart';
 import './Widgets/bottom_navigator.dart';
 import 'package:provider/provider.dart';
 import './States/scanner_state.dart';
@@ -16,8 +17,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ScannerState(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ScannerState()),
+        ChangeNotifierProvider(create: (context)=> CartelasProvider())
+      ],
       child: MaterialApp(
         title: 'Hagere Games Cartela Selector',
         theme: ThemeData(
@@ -41,31 +45,7 @@ class MyApp extends StatelessWidget {
               padding: EdgeInsets.only(top: 10.0),
               child: MyHomePage(),
             ),
-          ) /*Stack(
-            children: [
-              const SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: MyHomePage(),
-                ),
-              ),
-              // Text watermark overlay
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: Center(
-                    child: Text(
-                      'HAGERE GAMES!',
-                      style: TextStyle(
-                        color: Colors.grey.withOpacity(0.5), // Adjust color and opacity
-                        fontSize: 20.0, // Adjust the font size
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          )*/,
+          ),
           bottomNavigationBar: BottomNavigator(),
         ),
       ),
@@ -175,8 +155,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.blue, // This is the background color
-                          onPrimary: Colors.white, // This is the color of the text and icon
+                          backgroundColor: Colors.blue, // This is the background color
+                          iconColor: Colors.white, // This is the color of the text and icon
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10), // This is the border radius
                           ),
