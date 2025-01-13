@@ -1,18 +1,22 @@
 import 'package:flutter/foundation.dart';
-import 'package:hag_cart/Widgets/Jackpot/jackpotBoardApiCall.dart';
+import 'package:hag_cart/Widgets/Jackpot/ApiService.dart';
 import '../Widgets/Jackpot/jackpotBoardStorage.dart';
 import '../Widgets/Jackpot/boardModel.dart';
+import '../Widgets/Jackpot/ApiService.dart';
 
 
 class CartelasProvider extends ChangeNotifier
 {
+
+  final ApiService _apiService;
 
   String _boardSelectionMessage = '';
   final List<Board> _selectedBoards = [];
   List<Board> _availableBoards = [];
   final JackpotBoardStorage _storage = JackpotBoardStorage();
 
-  CartelasProvider()
+  CartelasProvider({required ApiService apiService})
+  : _apiService = apiService
   {
     _loadSavedBoards();
   }
@@ -30,7 +34,7 @@ class CartelasProvider extends ChangeNotifier
 
 
   Future<void> loadBoardsFromServer() async{
-    final boards = await fetchMockBoards();
+    final boards = await _apiService.fetchMockBoards();
     await _storage.saveBoards(boards);
     _availableBoards = boards;
     notifyListeners();
@@ -46,10 +50,30 @@ class CartelasProvider extends ChangeNotifier
       _boardSelectionMessage = 'board unavailable or already selected!';
     }
   }
-  void removeBoard(int boardId){
-    _selectedBoards.remove(boardId);
-    notifyListeners();
+  void removeBoard(int boardId) {
+    print('Board to remove: $boardId');
+    print('Selected boards before removal: ${_selectedBoards.length}');
+
+    // Find the board in _selectedBoards by boardId
+    Board? boardToRemove;
+    if (_selectedBoards.any((board) => board.boardId == boardId)) {
+      boardToRemove = _selectedBoards.firstWhere(
+            (board) => board.boardId == boardId,
+      );
+    } else {
+      // Handle the case where the board is not found (e.g., log an error)
+      print('Board with ID $boardId not found.');
+    }
+
+    if (boardToRemove != null) {
+      _selectedBoards.remove(boardToRemove);
+      print('Selected boards after removal: ${_selectedBoards.length}');
+      notifyListeners();
+    } else {
+      print('Board not found in selected boards!');
+    }
   }
+
   final Map<int, Set<String>> selectedCells = {}; // Map boardId to selected cells
 
   void toggleCell(int boardId, int row, int col) {

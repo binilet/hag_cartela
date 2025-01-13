@@ -46,12 +46,11 @@ class BottomNavigator extends StatelessWidget {
           if(cameraStatus.isDenied ){
             await Permission.camera.request();
           }
-
           if(storageStatus.isDenied){
             await Permission.storage.request();
           }
           Provider.of<ScannerState>(context,listen: false).setIsLoading(true);
-          await Provider.of<ScannerState>(context,listen: false).scanQR();
+          await Provider.of<ScannerState>(context,listen: false).scanQR(context);
           Provider.of<ScannerState>(context,listen: false).setIsLoading(false);
 
         }else if(index == 1){

@@ -2,17 +2,25 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hag_cart/States/cartelas_state.dart';
+import 'package:hag_cart/States/games_state.dart';
 import './Widgets/bottom_navigator.dart';
 import 'package:provider/provider.dart';
 import './States/scanner_state.dart';
 import './Widgets/BoardSelector.dart';
+import './Widgets/Jackpot/ApiService.dart';
 
 void main() {
-  runApp(const MyApp());
+  //const String baseUrl = 'http://localhost:5000/api';
+  //const String baseUrl = 'http://192.168.142.93:5000/api';
+  //https://api.hagere-games.com/api
+  const String baseUrl = 'https://api.hagere-games.com/api';
+  final apiService = ApiService(baseUrl: baseUrl);
+  runApp(MyApp(apiService: apiService));
 }
-
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ApiService apiService;
+
+  const MyApp({super.key,required this.apiService});
 
   // This widget is the root of your application.
   @override
@@ -20,10 +28,11 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ScannerState()),
-        ChangeNotifierProvider(create: (context)=> CartelasProvider())
+        ChangeNotifierProvider(create: (context)=> CartelasProvider(apiService: this.apiService)),
+        ChangeNotifierProvider(create: (context) => GamesProvider(apiService: this.apiService))
       ],
       child: MaterialApp(
-        title: 'Hagere Games Cartela Selector',
+        title: 'Hagere Games',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
           useMaterial3: true,
@@ -109,41 +118,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: EdgeInsets.only(left: 10.0, right: 10.0,bottom: 1.0),
                   child: Column(
                     children: [
-                      /*TextField(
-                        controller: board_id_controller,
-                        keyboardType: TextInputType.number,
-                        style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue),
-                        decoration: InputDecoration(
-                          hintText: 'ካርቴላ ቁጥር እዚ ያስገቡ',
-                          icon: Icon(
-                            Icons.table_chart_sharp,//clear selected cells
-                            color: Colors.blue, // adjust as needed
-                            size: 12.0,
-                          ),
-                          //filled: true, // Add this
-                          //fillColor: Colors.blue[100], // Add this
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Colors.blue),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            // Add this
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide:
-                            BorderSide(color: Colors.blue), // Modify this
-                          ), // Add this
-                        ),
-                        onSubmitted: (value) {
-                          Provider.of<ScannerState>(context, listen: false)
-                              .setSelectedBoard(value);
-                          /*setState(() {
-                        numbers = fetchNumbers(value);
-                      });*/
-                        },
-                      ),*/
                       ElevatedButton(
                         onPressed: () {
                           // Handle button press here

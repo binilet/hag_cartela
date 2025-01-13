@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
+//import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:flutter/services.dart';
+
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import '../Widgets/QRScannerScreen.dart';
 
 class Board {
   final int boardId;
@@ -12,13 +16,11 @@ class Board {
   final String companyId;
   final List<List<int>> cartNums;
 
-  Board(
-      {
-        required this.boardId,
+  Board({
+      required this.boardId,
       required this.branch,
       required this.companyId,
-      required this.cartNums
-      });
+      required this.cartNums});
 }
 
 class ScannerState extends ChangeNotifier {
@@ -46,20 +48,18 @@ class ScannerState extends ChangeNotifier {
   String? _message;
   String? get message => _message;
 
-
-
   void setIsLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  void removeBoard(int id){
+  void removeBoard(int id) {
     _selected_boards.removeWhere((element) => element.boardId == id);
     notifyListeners();
   }
 
-  void resetBoards(){
-    if(selected_boards != null){
+  void resetBoards() {
+    if (selected_boards != null) {
       _selected_boards = [];
     }
     notifyListeners();
@@ -74,51 +74,65 @@ class ScannerState extends ChangeNotifier {
       return;
     }
     Board? selected;
-    try{
-      selected = _boards.firstWhere(
-              (element) => element.boardId.toString() == value
-      );
-    }catch(e){
-        _message = "Cartela not found!";
-        notifyListeners();
+    try {
+      selected =
+          _boards.firstWhere((element) => element.boardId.toString() == value);
+    } catch (e) {
+      _message = "Cartela not found!";
+      notifyListeners();
     }
     if (selected != null) {
-      if(_selected_boards!.length < 4 )
-      {
+      if (_selected_boards!.length < 4) {
         if (!_selected_boards!.contains(selected)) {
           _selectedBoard = selected;
           _selected_boards?.add(_selectedBoard!);
           _message = "";
         } else {
-          _selected_boards.removeWhere((element) => element.boardId.toString() == value);
+          _selected_boards
+              .removeWhere((element) => element.boardId.toString() == value);
           //_message = "Board already added!";
         }
-      }else{
+      } else {
         _message = "Maximum board reached (4)!";
       }
-
     } else {
       _message = "No board found with board Id: $value";
     }
     notifyListeners();
   }
 
-
-  Future scanQR() async {
+  /*Future scanQR() async {
     try {
-      String? cameraScanResult = await scanner.scan();
+      final MobileScannerController controller = MobileScannerController();
+      String? cameraScanResult;//await scanner.scan();
+      await controller.start();
+      controller.barcodes.listen((barcodeCapture){
+        if(barcodeCapture.barcodes.isNotEmpty){
+          cameraScanResult = barcodeCapture.barcodes.first.rawValue;
+          if(cameraScanResult != null)
+            controller.stop();
+        };
+      });
+
+    // Wait until a barcode is scanned
+    while (cameraScanResult == null) {
+    await Future.delayed(const Duration(milliseconds: 100));
+    }
+
+
+
       _scannedCompanyId = cameraScanResult;
       _isLoadingDone = false;
 
       //production url
-      var url = Uri.parse("http://161.35.114.115:5001/api/boards/company/$_scannedCompanyId");
-
+      var url = Uri.parse(
+          "http://161.35.114.115:5001/api/boards/company/$_scannedCompanyId");
 
       //test url
       //var url = Uri.parse("https://a3cdba200cac419a9db92572fbcb9a07.api.mockbin.io/");
 
-
-      var response = await http.get(url,headers: {'x-api-key': 'b7a3c12d7b9e46a396155c95b052f94e'});
+      var response = await http
+          .get(url, headers: {'x-api-key': 'b7a3c12d7b9e46a396155c95b052f94e'});
       //var response = await http.get(url);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body) as List;
@@ -131,7 +145,6 @@ class ScannerState extends ChangeNotifier {
                     item['board_numbers'].map((i) => List<int>.from(i)))))
             .toList();
         for (int i = 0; i < _boards.length; i++) print(_boards[i].boardId);
-
       } else {
         _isLoadingDone = true;
         setIsLoading(false);
@@ -147,5 +160,61 @@ class ScannerState extends ChangeNotifier {
       _isLoadingDone = true;
       setIsLoading(false);
     }
+  }*/
+
+  Future<void> scanQR(BuildContext context) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QRCodeScannerScreen(
+          onScanned: (String scannedData) async {
+            _scannedCompanyId = scannedData;
+            await fetchBoardData();
+          },
+        ),
+      ),
+    );
   }
+
+  Future<void> fetchBoardData() async {
+    try {
+      _isLoadingDone = false;
+
+      // Production URL
+      var url = Uri.parse(
+          "http://161.35.114.115:5001/api/boards/company/$_scannedCompanyId");
+
+      // Send GET request
+      var response = await http.get(
+        url,
+        headers: {'x-api-key': 'b7a3c12d7b9e46a396155c95b052f94e'},
+      );
+
+      if (response.statusCode == 200) {
+        // Parse response data
+        var data = jsonDecode(response.body) as List;
+        _boards = data
+            .map((item) => Board(
+          boardId: item['board_id'],
+          branch: item['branch_id'],
+          companyId: item['company_id'],
+          cartNums: List<List<int>>.from(
+              item['board_numbers'].map((i) => List<int>.from(i))),
+        ))
+            .toList();
+
+        print('Boards loaded successfully');
+      } else {
+        print('Failed to load boards');
+      }
+
+      _message = "${_boards.length} Cartelas found!";
+    } catch (e) {
+      print('Error fetching board data: $e');
+    } finally {
+      _isLoadingDone = true;
+      notifyListeners();
+    }
+  }
+
 }

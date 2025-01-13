@@ -41,8 +41,10 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  qrscan: ^0.3.3
+
+  mobile_scanner: ^6.0.2
   http: ^1.1.2
+  intl: ^0.18.1
   permission_handler: ^11.1.0
   flutter_launcher_icons: ^0.13.1
 
