@@ -33,7 +33,7 @@ class ApiService{
     }
   }
 
-  Future<List<Board>> fetchMockBoards() async{
+  Future<List<Board>> fetchJackpotBoards() async{
     try{
       String _scannedCompanyId = "HagereGames_HG";
       final response = await http.get(Uri.parse("$baseUrl/boards/company/$_scannedCompanyId"),

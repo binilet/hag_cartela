@@ -10,6 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import '../Widgets/QRScannerScreen.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Board {
   final int boardId;
   final String branch;
@@ -21,6 +23,27 @@ class Board {
       required this.branch,
       required this.companyId,
       required this.cartNums});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'board_id': boardId,
+      'board_numbers': cartNums,
+      'company_id': companyId,
+      'branch_id': branch,
+    };
+  }
+
+  factory Board.fromJson(Map<String, dynamic> json) {
+    return Board(
+      boardId: json['board_id'],
+      cartNums: List<List<int>>.from(
+          json['board_numbers'].map((row) => List<int>.from(row))),
+      companyId: json['company_id'],
+      branch: json['branch_id'],
+    );
+  }
+
+
 }
 
 class ScannerState extends ChangeNotifier {
@@ -29,6 +52,8 @@ class ScannerState extends ChangeNotifier {
   String? get scannedCompanyId => _scannedCompanyId;
 
   List<Board> _boards = [];
+  List<Board> get boards => _boards;
+
 
   List<Board> _selected_boards = [];
   List<Board> get selected_boards => _selected_boards;
@@ -41,7 +66,7 @@ class ScannerState extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  List<Board> get boards => _boards;
+
 
   Board? get selectedBoard => _selectedBoard;
 
@@ -203,12 +228,19 @@ class ScannerState extends ChangeNotifier {
         ))
             .toList();
 
+        //save to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        prefs.remove('normalBoards');
+        final encodedBoards = _boards.map((board) => json.encode(board.toJson())).toList();
+        prefs.setStringList('normalBoards', encodedBoards);
+
         print('Boards loaded successfully');
       } else {
         print('Failed to load boards');
       }
 
       _message = "${_boards.length} Cartelas found!";
+
     } catch (e) {
       print('Error fetching board data: $e');
     } finally {
@@ -217,4 +249,20 @@ class ScannerState extends ChangeNotifier {
     }
   }
 
+  ///load from saved local preference storage
+  Future<void> loadBoards() async
+  {
+    _isLoadingDone = false;
+    _message = "Loading...";
+    notifyListeners();  // Notify UI that loading has started
+
+    final prefs = await SharedPreferences.getInstance();
+    final savedBoards = prefs.getStringList('normalBoards')??[];
+    List<Board> storedBoards =  savedBoards.map((board) => Board.fromJson(json.decode(board))).toList();
+    _boards = storedBoards;
+    _isLoadingDone = true;
+    _message = "${_boards.length} Saved Cartelas found!";
+
+    notifyListeners();
+  }
 }

@@ -95,6 +95,13 @@ class _MyHomePageState extends State<MyHomePage> {
         (_) => List.filled(25, Colors.white),
        );
     });
+
+    _loadBoards();
+  }
+
+  // Load boards from SharedPreferences and notify listeners
+  void _loadBoards() async {
+    await Provider.of<ScannerState>(context, listen: false).loadBoards();
   }
 
   @override

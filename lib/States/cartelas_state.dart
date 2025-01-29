@@ -34,7 +34,7 @@ class CartelasProvider extends ChangeNotifier
 
 
   Future<void> loadBoardsFromServer() async{
-    final boards = await _apiService.fetchMockBoards();
+    final boards = await _apiService.fetchJackpotBoards();
     await _storage.saveBoards(boards);
     _availableBoards = boards;
     notifyListeners();
