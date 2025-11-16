@@ -106,240 +106,289 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Color> blueShades = [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue];
+    List<Color> blueShades = [
+      Colors.red,
+      Colors.orange,
+      Colors.yellow,
+      Colors.green,
+      Colors.blue
+    ];
     final myState = Provider.of<ScannerState>(context);
-    // Get the screen width
     double screenWidth = MediaQuery.of(context).size.width;
+    double textSize = screenWidth * 0.04;
 
-    // Calculate the text size based on the screen width
-    double textSize = screenWidth * 0.04; // You can adjust the multiplier as needed
     return Material(
       child: Column(
         children: <Widget>[
-          Row(
-            // Add this
-            children: <Widget>[
-              Expanded(
-                // Add this
-                child: Padding(
-                  padding: EdgeInsets.only(left: 10.0, right: 10.0,bottom: 1.0),
-                  child: Column(
+          // Select Cartela Button
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 1.0),
+            child: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BoardSelectorWidget(data: myState.boards),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    minimumSize: const Size(250, 50),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          // Handle button press here
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BoardSelectorWidget(data: myState.boards),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // This is the background color
-                          iconColor: Colors.white, // This is the color of the text and icon
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10), // This is the border radius
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16), // Adjust as needed
-                          minimumSize: Size(250, 50), // Adjust as needed
+                      Icon(Icons.add),
+                      SizedBox(width: 8),
+                      Text(
+                        'Select Cartela Here',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.add), // Add your desired icon
-                            SizedBox(width: 8), // Adjust spacing between icon and text
-                            Text('Select Cartela Here',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16.0),),
-                          ],
-                        ),
-                      )
-                      ,
-
-
-      Column(
-                        children: [
-                          Text(
-                            myState.isLoadingDone ? '${myState.message}' : '',
-                            style: TextStyle(
-                                color: myState.boards.length > 0 ? Colors.blue : Colors.red,
-                                fontWeight: FontWeight.w400),
-
-                          ),
-                          Text(
-                            myState.scannedCompanyId != null ? myState.scannedCompanyId.toString() : '',
-                            style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.w400),
-
-                          ),
-                        ],
-                      )
+                      ),
                     ],
                   ),
                 ),
-              ), // Add this
-            ],
-          ), // A,
-
-          Consumer<ScannerState>(builder: (context, ScannerState, _) {
-            return ScannerState.isLoading ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                Column(
                   children: [
-                    CircularProgressIndicator(color: Colors.blue,),
-                    SizedBox(height: 16,),
                     Text(
-                      'Loading Cartelas...', // Display a loading message
-                      style: TextStyle(color: Colors.blue, fontSize: 16),
-                    )
+                      myState.isLoadingDone ? '${myState.message}' : '',
+                      style: TextStyle(
+                        color: myState.boards.length > 0 ? Colors.blue : Colors.red,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Text(
+                      myState.scannedCompanyId != null
+                          ? myState.scannedCompanyId.toString()
+                          : '',
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ],
                 ),
-            )  : Wrap(
-              spacing: 2.0, // space between rows
-              runSpacing: 10.0, // space between lines
-              children: List<Widget>.generate(
-                  ScannerState.selected_boards.length, (boardIndex) {
-                //List<Color> boardColors = List.filled(25, Colors.white);
+              ],
+            ),
+          ),
 
-                return SizedBox(
-                  width: ScannerState.selected_boards.length < 2
-                      ? MediaQuery.of(context).size.width - 5
-                      : MediaQuery.of(context).size.width / 2 -
-                          5, // adjust width as needed
+          // Selected Boards Display
+          Consumer<ScannerState>(
+            builder: (context, scannerState, _) {
+              if (scannerState.isLoading) {
+                return const Center(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Row(
-                        // Add this
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Add this
-                        children: 'BINGO'
-                            .split('')
-                               .map((letter) => Text(letter,
-                            style: TextStyle(
-                                fontSize: 24.0,
-                                color: blueShades['BINGO'.indexOf(letter)],
-                                fontWeight: FontWeight.w900,
-                              shadows: [
-                                Shadow( // bottomLeft
-                                  offset: Offset(-1.0, -1.0),
-                                  color: Colors.black,
-                                )
-                              ],
-                              letterSpacing: 2.0, // adjust as needed
-                              wordSpacing: 2.0, // adjust as needed
-                            )),
-                        )
-                            .toList(), // Add this
+                      CircularProgressIndicator(color: Colors.blue),
+                      SizedBox(height: 16),
+                      Text(
+                        'Loading Cartelas...',
+                        style: TextStyle(color: Colors.blue, fontSize: 16),
                       ),
-                      Card(
-                        margin: EdgeInsets.all(2.0),
-                        // Add margin to create space between the grids
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          itemCount: 25,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5,
-                            crossAxisSpacing: 0.0,
-                            mainAxisSpacing: 0.0,
-                          ),
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  boardColorsList?[boardIndex][index] =
-                                  boardColorsList?[boardIndex][index] == Colors.white ? Colors.blue : Colors.white;
-                                });
-                              },
-                              child: Card(
-                                elevation: 10.0,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: boardColorsList?[boardIndex][index],
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    border: Border.all(color: Colors.white10),
-                                  ),
-                                  child: Center(
-                                    child: (index % 5 == 2 && index ~/ 5 == 2)
-                                        ? Icon(
-                                      Icons.ac_unit_rounded, // replace with your preferred icon
-                                      color: boardColorsList?[boardIndex][index] == Colors.white
-                                          ? Colors.blueGrey
-                                          : Colors.white,
-                                    )
-                                        : Text(
-                                      ScannerState.selected_boards[boardIndex]
-                                          .cartNums[index % 5][index ~/ 5]
-                                          .toString(),
-                                      style: TextStyle(
-                                        fontSize: textSize, // adjust as needed
-                                        color: boardColorsList?[boardIndex][index] == Colors.white
-                                            ? Colors.blueGrey
-                                            : Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        // adjust as needed
-                        children: <Widget>[
-                          Text(
-                            'Board: ${ScannerState.selected_boards[boardIndex].boardId}',
-                            // Add your board number here
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              // adjust as needed
-                              fontWeight: FontWeight.bold,
-                              // adjust as needed
-                              color: Colors.blue, // adjust as needed
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.cleaning_services_sharp,//clear selected cells
-                              color: Colors.red, // adjust as needed
-                              size: 16.0,
-                            ),
-                            onPressed: () {
-                              // Add your clear function here
-                              for(int i = 0;i<25;i++){
-                                setState(() {
-                                  boardColorsList?[boardIndex][i] =Colors.white;
-                                });
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              color: Colors.red, // adjust as needed
-                              size: 16.0, // adjust as needed
-                            ),
-                            onPressed: () {
-                              // Add your clear function here
-                              ScannerState.removeBoard(ScannerState.selected_boards[boardIndex].boardId);
-                            },
-                          ),
-                        ],
-                      )
                     ],
                   ),
                 );
-              }),
-            );
-          }),
+              }
+
+              final selectedBoards = scannerState.selected_boards;
+              final isSingleBoard = selectedBoards.length == 1;
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(4),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isSingleBoard ? 1 : 2,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: isSingleBoard ? 0.85 : 0.75,
+                ),
+                itemCount: selectedBoards.length,
+                itemBuilder: (context, boardIndex) {
+                  final board = selectedBoards[boardIndex];
+                  final boardWidth = isSingleBoard
+                      ? screenWidth - 10
+                      : screenWidth / 2 - 7;
+
+                  return Card(
+                    margin: EdgeInsets.zero,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(isSingleBoard ? 16 : 12),
+                      child: Column(
+                        children: [
+                          // BINGO Header
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: 'BINGO'.split('').asMap().entries.map((entry) {
+                              return Text(
+                                entry.value,
+                                style: TextStyle(
+                                  fontSize: isSingleBoard ? 28.0 : 20.0,
+                                  color: blueShades[entry.key],
+                                  fontWeight: FontWeight.w900,
+                                  shadows: const [
+                                    Shadow(
+                                      offset: Offset(1, 1),
+                                      blurRadius: 2,
+                                      color: Colors.black26,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+
+                          SizedBox(height: isSingleBoard ? 12 : 8),
+
+                          // Bingo Grid
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: GridView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: 25,
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 5,
+                                crossAxisSpacing: isSingleBoard ? 4 : 3,
+                                mainAxisSpacing: isSingleBoard ? 4 : 3,
+                              ),
+                              itemBuilder: (context, index) {
+                                final isFreeSpace = index % 5 == 2 && index ~/ 5 == 2;
+                                final cellColor = boardColorsList?[boardIndex][index] ?? Colors.white;
+                                final isMarked = cellColor != Colors.white;
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      boardColorsList?[boardIndex][index] =
+                                      isMarked ? Colors.white : Colors.blue;
+                                    });
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: cellColor,
+                                      borderRadius: BorderRadius.circular(
+                                        isSingleBoard ? 8 : 6,
+                                      ),
+                                      border: Border.all(
+                                        color: isMarked
+                                            ? Colors.blue[700]!
+                                            : Colors.grey[300]!,
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: isFreeSpace
+                                          ? Icon(
+                                        Icons.star,
+                                        color: isMarked
+                                            ? Colors.white
+                                            : Colors.amber,
+                                        size: isSingleBoard ? 24 : 18,
+                                      )
+                                          : Text(
+                                        board.cartNums[index % 5][index ~/ 5]
+                                            .toString(),
+                                        style: TextStyle(
+                                          fontSize: isSingleBoard ? 18 : 13,
+                                          color: isMarked
+                                              ? Colors.white
+                                              : Colors.blueGrey[800],
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+
+                          SizedBox(height: isSingleBoard ? 12 : 8),
+
+                          // Board ID and Actions
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Flexible(
+                                child: Text(
+                                  'Board: ${board.boardId}',
+                                  style: TextStyle(
+                                    fontSize: isSingleBoard ? 16.0 : 12.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    for (int i = 0; i < 25; i++) {
+                                      boardColorsList?[boardIndex][i] = Colors.white;
+                                    }
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Icon(
+                                    Icons.refresh,
+                                    color: Colors.orange,
+                                    size: isSingleBoard ? 18.0 : 16.0,
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  scannerState.removeBoard(board.boardId);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: isSingleBoard ? 18.0 : 16.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
     );
   }
-
   List<List<int>> fetchNumbers(String company_id) {
     var rng = Random();
     return List.generate(

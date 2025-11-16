@@ -205,7 +205,7 @@ class ScannerState extends ChangeNotifier {
     try {
       _isLoadingDone = false;
 
-      // Production URL
+      // Production URL board api url running on 5001
       var url = Uri.parse(
           "http://161.35.114.115:5001/api/boards/company/$_scannedCompanyId");
 
